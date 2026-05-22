@@ -1,6 +1,7 @@
 "use client";
 
 import TopHeader from "@/components/TopHeader";
+import EDaanMap from "@/components/EDaanMap";
 import { ShieldAlert, AlertTriangle, LightbulbOff, Camera, MapPin, Gift, Navigation, Send } from "lucide-react";
 import Link from "next/link";
 
@@ -74,9 +75,9 @@ export default function Hazard() {
             <h3 className="text-[10px] font-bold text-zinc-900 uppercase tracking-wider">Detected Location</h3>
             <div className="ml-auto w-2 h-2 rounded-full bg-[#126b34]"></div>
           </div>
-          <div className="h-32 bg-zinc-200 relative">
-             <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/122.56,-10.72,15/400x200?access_token=pk.eyJ1IjoiZGFtbXkxMjM0IiwiYSI6ImNsbzMwYzlvODAwNWoya3BocGpjNXlpeGoifQ.yN1T7p0H1K8h4D_X50P80Q" alt="Map" className="w-full h-full object-cover opacity-80 mix-blend-multiply" />
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#126b34] rounded-full border-2 border-white shadow-md"></div>
+          <div className="h-32 bg-zinc-200 relative overflow-hidden">
+             <EDaanMap className="w-full h-full opacity-80 mix-blend-multiply pointer-events-none" />
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#126b34] rounded-full border-2 border-white shadow-md z-20"></div>
           </div>
           <div className="px-4 py-3 flex gap-2 items-start bg-[#e8eae8]">
             <ShieldAlert size={14} className="text-zinc-500 flex-shrink-0 mt-0.5" />

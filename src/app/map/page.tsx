@@ -1,6 +1,7 @@
 "use client";
 
 import TopHeader from "@/components/TopHeader";
+import EDaanMap from "@/components/EDaanMap";
 import { CornerUpRight, ShieldCheck, Zap, AlertTriangle } from "lucide-react";
 
 export default function MapNavigation() {
@@ -8,16 +9,14 @@ export default function MapNavigation() {
     <main className="min-h-screen relative flex flex-col h-screen">
       {/* Map Background Simulation */}
       <div className="absolute inset-0 z-0">
-        <div className="w-full h-full bg-[#e8eae8]">
-            <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/122.56,-10.72,16/600x800?access_token=pk.eyJ1IjoiZGFtbXkxMjM0IiwiYSI6ImNsbzMwYzlvODAwNWoya3BocGpjNXlpeGoifQ.yN1T7p0H1K8h4D_X50P80Q" alt="Map" className="w-full h-full object-cover opacity-80" />
-            {/* SVG route path overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-               <svg width="100%" height="100%" className="absolute inset-0">
-                 <path d="M150 400 L250 500 L300 450 L350 200" stroke="#126b34" strokeWidth="6" fill="none" opacity="0.8" />
-                 <circle cx="150" cy="400" r="8" fill="#126b34" />
-                 <circle cx="350" cy="200" r="8" fill="#126b34" />
-               </svg>
-            </div>
+        <EDaanMap className="w-full h-full" />
+        {/* SVG route path overlay (optional visual flair for now) */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+           <svg width="100%" height="100%" className="absolute inset-0">
+             <path d="M150 400 L250 500 L300 450 L350 200" stroke="#126b34" strokeWidth="6" fill="none" opacity="0.8" />
+             <circle cx="150" cy="400" r="8" fill="#126b34" />
+             <circle cx="350" cy="200" r="8" fill="#126b34" />
+           </svg>
         </div>
       </div>
 

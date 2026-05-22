@@ -1,6 +1,7 @@
 "use client";
 
 import TopHeader from "@/components/TopHeader";
+import EDaanMap from "@/components/EDaanMap";
 import { Search, SlidersHorizontal, BatteryCharging, ChevronRight, Navigation } from "lucide-react";
 
 export default function Charging() {
@@ -8,8 +9,8 @@ export default function Charging() {
     <main className="min-h-screen relative flex flex-col h-screen">
       {/* Map Background Simulation */}
       <div className="absolute inset-0 z-0">
-        <div className="w-full h-[60%] bg-[#b8cfb8]">
-            <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/122.56,-10.72,13/600x600?access_token=pk.eyJ1IjoiZGFtbXkxMjM0IiwiYSI6ImNsbzMwYzlvODAwNWoya3BocGpjNXlpeGoifQ.yN1T7p0H1K8h4D_X50P80Q" alt="Map" className="w-full h-full object-cover opacity-80 mix-blend-multiply filter sepia-[0.3] hue-rotate-[90deg] saturate-[0.8]" />
+        <div className="w-full h-[60%] bg-[#b8cfb8] relative overflow-hidden">
+          <EDaanMap className="w-full h-full opacity-80 mix-blend-multiply filter sepia-[0.3] hue-rotate-[90deg] saturate-[0.8]" />
         </div>
       </div>
 

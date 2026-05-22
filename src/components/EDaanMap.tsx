@@ -218,12 +218,12 @@ function addMarkers(
   );
 }
 
-export default function EDaanMap() {
+export default function EDaanMap({ className = "" }: { className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<Marker[]>([]);
 
-  useEffect(() => {
+  useEffect(() => {  
     if (!containerRef.current || mapRef.current) {
       return;
     }
@@ -268,7 +268,7 @@ export default function EDaanMap() {
   }, []);
 
   return (
-    <div className="relative h-full min-h-[420px] overflow-hidden edaan-card">
+    <div className={`relative overflow-hidden ${className || "h-full min-h-[420px] edaan-card"}`}>
       <div
         ref={containerRef}
         aria-label="Interactive e-Daan map centered on Iloilo City"
@@ -276,17 +276,19 @@ export default function EDaanMap() {
       />
 
       {!mapTilerKey ? (
-        <div className="absolute bottom-4 left-4 edaan-muted text-xs font-semibold text-amber-100 shadow-lg">
+        <div className="absolute bottom-4 left-4 bg-zinc-800/80 text-white p-2 rounded text-xs shadow-lg z-10 pointer-events-auto">
           Add NEXT_PUBLIC_MAPTILER_KEY for MapTiler tiles
         </div>
       ) : null}
 
-      <div className="absolute left-4 top-4 grid gap-2 p-3 edaan-card sm:grid-cols-2">
-        <MapLegend label="Start" tone="start" />
-        <MapLegend label="Destination" tone="destination" />
-        <MapLegend label="Charging" tone="charging" />
-        <MapLegend label="Restricted" tone="warning" />
-      </div>
+      {!className && (
+        <div className="absolute left-4 top-4 grid gap-2 p-3 edaan-card sm:grid-cols-2 pointer-events-auto">
+          <MapLegend label="Start" tone="start" />
+          <MapLegend label="Destination" tone="destination" />
+          <MapLegend label="Charging" tone="charging" />
+          <MapLegend label="Restricted" tone="warning" />
+        </div>
+      )}
     </div>
   );
 }

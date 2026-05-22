@@ -119,7 +119,7 @@ export default function SelectVehicle() {
                 <Gift size={14} className="text-[#2bc18b]" /> Eco-Reward Bonus
               </div>
               <p className="text-[9px] text-[#d1f2d9]">
-                Complete this trip with >15% battery to earn <span className="font-bold text-white">500 DAAN</span> tokens.
+                Complete this trip with &gt;15% battery to earn <span className="font-bold text-white">500 DAAN</span> tokens.
               </p>
            </div>
            
