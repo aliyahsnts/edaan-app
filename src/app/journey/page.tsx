@@ -69,7 +69,7 @@ export default function SelectVehicle() {
           </div>
           
           <div className="flex flex-col gap-2">
-            <div className="bg-[#f4f9f6] rounded-xl p-3 flex justify-between items-center">
+            <div className="bg-[#eef7f1] rounded-xl p-3 flex justify-between items-center">
                <div>
                  <h4 className="text-xs font-bold text-zinc-900">Aggressive Driving</h4>
                  <p className="text-[9px] text-zinc-500 mt-0.5">Higher power consumption</p>
@@ -78,7 +78,7 @@ export default function SelectVehicle() {
                  <div className="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
                </div>
             </div>
-            <div className="bg-[#f4f9f6] rounded-xl p-3 flex justify-between items-center">
+            <div className="bg-[#eef7f1] rounded-xl p-3 flex justify-between items-center">
                <div>
                  <h4 className="text-xs font-bold text-zinc-900">Full AC/Heating</h4>
                  <p className="text-[9px] text-zinc-500 mt-0.5">Reduces range by ~12%</p>
@@ -129,26 +129,26 @@ export default function SelectVehicle() {
         </div>
 
         {/* Journey Settings */}
-        <div className="bg-white rounded-2xl p-5 border border-zinc-100 mt-2">
+        <div className="bg-[#f0f6f2] rounded-2xl p-5 border-none mt-2">
            <div className="flex items-center gap-2 font-bold text-zinc-900 mb-4 text-sm">
-             <Settings2 size={16} className="text-zinc-500" />
+             <Settings2 size={16} className="text-zinc-600" />
              Journey Settings
            </div>
            
            <div className="flex flex-col gap-3">
               <div className="flex justify-between items-center text-xs text-zinc-700">
                 <span>Avoid Tolls</span>
-                <div className="w-4 h-4 rounded border border-zinc-300"></div>
+                <div className="w-4 h-4 rounded-sm border border-zinc-400 bg-white"></div>
               </div>
               <div className="flex justify-between items-center text-xs text-zinc-900 font-medium">
                 <span>Prioritize Fast Chargers</span>
-                <div className="w-4 h-4 rounded bg-[#126b34] text-white flex items-center justify-center">
+                <div className="w-4 h-4 rounded-sm bg-[#126b34] text-white flex items-center justify-center">
                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
               </div>
               <div className="flex justify-between items-center text-xs text-zinc-900 font-medium">
                 <span>Eco-Routing</span>
-                <div className="w-4 h-4 rounded bg-[#126b34] text-white flex items-center justify-center">
+                <div className="w-4 h-4 rounded-sm bg-[#126b34] text-white flex items-center justify-center">
                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
               </div>
