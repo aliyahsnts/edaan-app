@@ -82,7 +82,7 @@ export default function Profile() {
               </div>
               <div>
                 <h4 className="text-sm font-bold text-zinc-900">LEV - Electric Kickscooter</h4>
-                <p className="text-xs text-zinc-500">Primary • 85% Battery</p>
+                <p className="text-xs text-zinc-500">Primary - manual battery entry</p>
               </div>
             </div>
             <div className="flex items-center gap-4 p-4">

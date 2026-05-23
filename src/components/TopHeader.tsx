@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
@@ -61,11 +62,17 @@ export default function TopHeader({ rightAction = "avatar" }: TopHeaderProps) {
 
         <Link
           href="/"
-          className="flex items-center justify-center font-bold text-xl tracking-tight text-[#126b34]"
+          className="flex items-center justify-center"
           aria-label="e-Daan home"
         >
-          <span className="text-[#e75f78] mr-1 italic text-2xl font-black">e</span>
-          <span>-Daan</span>
+          <Image
+            src="/edaan-logo.png"
+            alt="e-Daan - The smarter way forward"
+            width={114}
+            height={38}
+            priority
+            className="h-9 w-auto"
+          />
         </Link>
 
         <div className="flex items-center gap-3">

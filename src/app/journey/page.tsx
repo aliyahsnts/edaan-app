@@ -1,10 +1,37 @@
 "use client";
 
-import TopHeader from "@/components/TopHeader";
-import { Bike, Car, Battery, Zap, Settings, CheckSquare, Gift, Settings2 } from "lucide-react";
 import Link from "next/link";
+import TopHeader from "@/components/TopHeader";
+import ManualBatteryInput from "@/components/ManualBatteryInput";
+import { Bike, Car, Battery, Zap, Gift, Settings2 } from "lucide-react";
+import {
+  getSelectedVehicleModel,
+  getVehicleCapacityPercent,
+  getVehicleModelName,
+  getVehicleModels,
+  getVehicleType,
+  vehicleTypes,
+} from "@/lib/vehicle-profile";
+import {
+  updateVehicleProfile,
+  useVehicleProfile,
+} from "@/lib/use-vehicle-profile";
 
 export default function SelectVehicle() {
+  const vehicleProfile = useVehicleProfile();
+  const { batteryPercentage, selectedTypeId } = vehicleProfile;
+  const selectedType = getVehicleType(selectedTypeId);
+  const selectedModels = getVehicleModels(selectedTypeId);
+  const selectedModel = getSelectedVehicleModel(vehicleProfile);
+  const selectedModelName = getVehicleModelName(selectedModel);
+  const capacityPercent = getVehicleCapacityPercent(
+    selectedTypeId,
+    selectedModel,
+  );
+  const estimatedRangeKm = Math.round(
+    (selectedModel.maxRangeKm * batteryPercentage) / 100,
+  );
+
   return (
     <main className="min-h-screen pb-24">
       <TopHeader rightAction="avatar" />
@@ -14,58 +41,158 @@ export default function SelectVehicle() {
         <div>
           <h1 className="text-2xl font-black text-[#126b34] tracking-tight">Select Your Vehicle</h1>
           <p className="text-xs text-zinc-600 mt-2 leading-relaxed">
-            Choose your electric vehicle class to optimize routing efficiency.
+            Choose the vehicle class and brand model so battery capacity matches the ride.
           </p>
         </div>
 
         {/* Vehicle Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <button className="edaan-card bg-white p-4 flex flex-col items-center justify-center gap-2 text-center hover:bg-zinc-50 border border-zinc-100">
-            <div className="w-12 h-12 rounded-full bg-[#eef7f1] text-[#126b34] flex items-center justify-center mb-1">
-              <Bike size={24} />
-            </div>
-            <span className="text-sm font-bold text-zinc-900">E-Bike</span>
-            <span className="bg-zinc-100 text-zinc-500 text-[9px] font-bold px-2 py-0.5 rounded-full">L1 Category</span>
-          </button>
-          <button className="edaan-card bg-white p-4 flex flex-col items-center justify-center gap-2 text-center hover:bg-zinc-50 border border-zinc-100">
-             <div className="w-12 h-12 rounded-full bg-[#eef7f1] text-[#126b34] flex items-center justify-center mb-1">
-              <Bike size={24} />
-            </div>
-            <span className="text-sm font-bold text-zinc-900">E-Scooter</span>
-            <span className="bg-zinc-100 text-zinc-500 text-[9px] font-bold px-2 py-0.5 rounded-full">L2 Class</span>
-          </button>
-          <button className="edaan-card bg-white p-4 flex flex-col items-center justify-center gap-2 text-center border-2 border-[#126b34] shadow-sm">
-            <div className="w-12 h-12 rounded-full bg-[#126b34] text-white flex items-center justify-center mb-1 shadow-md shadow-[#126b34]/20">
-              <Car size={24} />
-            </div>
-            <span className="text-sm font-bold text-zinc-900">EV Car</span>
-            <span className="bg-[#eef7f1] text-[#126b34] text-[9px] font-bold px-2 py-0.5 rounded-full">M1 Category</span>
-          </button>
-          <button className="edaan-card bg-white p-4 flex flex-col items-center justify-center gap-2 text-center hover:bg-zinc-50 border border-zinc-100">
-             <div className="w-12 h-12 rounded-full bg-[#eef7f1] text-[#126b34] flex items-center justify-center mb-1">
-              <Car size={24} />
-            </div>
-            <span className="text-sm font-bold text-zinc-900">LEV</span>
-            <span className="bg-zinc-100 text-zinc-500 text-[9px] font-bold px-2 py-0.5 rounded-full">Micro-mobility</span>
-          </button>
+          {vehicleTypes.map((vehicleType) => {
+            const Icon = vehicleType.iconKey === "bike" ? Bike : Car;
+            const isSelected = vehicleType.id === selectedTypeId;
+
+            return (
+              <button
+                aria-pressed={isSelected}
+                className={`edaan-card bg-white p-4 flex flex-col items-center justify-center gap-2 text-center border transition-colors ${
+                  isSelected
+                    ? "border-[#126b34] ring-2 ring-[#126b34] shadow-sm"
+                    : "border-zinc-100 hover:bg-zinc-50"
+                }`}
+                key={vehicleType.id}
+                onClick={() =>
+                  updateVehicleProfile((currentProfile) => ({
+                    ...currentProfile,
+                    selectedTypeId: vehicleType.id,
+                  }))
+                }
+                type="button"
+              >
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center mb-1 ${
+                    isSelected
+                      ? "bg-[#126b34] text-white shadow-md shadow-[#126b34]/20"
+                      : "bg-[#eef7f1] text-[#126b34]"
+                  }`}
+                >
+                  <Icon size={24} />
+                </div>
+                <span className="text-sm font-bold text-zinc-900">
+                  {vehicleType.label}
+                </span>
+                <span
+                  className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    isSelected
+                      ? "bg-[#eef7f1] text-[#126b34]"
+                      : "bg-zinc-100 text-zinc-500"
+                  }`}
+                >
+                  {vehicleType.category}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Predictive Battery Engine */}
+        {/* Brand Model Choices */}
+        <div className="bg-white rounded-2xl p-5 border border-zinc-100 shadow-sm">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-sm font-black text-zinc-900">
+                Choose brand / model
+              </h2>
+              <p className="text-[10px] text-zinc-500 mt-1">
+                {selectedType.label} presets use different battery capacities.
+              </p>
+            </div>
+            <span className="shrink-0 rounded-full bg-[#eef7f1] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-[#126b34]">
+              {selectedType.label}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {selectedModels.map((model) => {
+              const isSelected = model.id === selectedModel.id;
+
+              return (
+                <button
+                  aria-pressed={isSelected}
+                  className={`rounded-xl border p-3 text-left transition-colors ${
+                    isSelected
+                      ? "border-[#126b34] bg-[#eef7f1] ring-1 ring-[#126b34]"
+                      : "border-zinc-100 bg-white hover:bg-zinc-50"
+                  }`}
+                  key={model.id}
+                  onClick={() =>
+                    updateVehicleProfile((currentProfile) => ({
+                      ...currentProfile,
+                      selectedModelIdByType: {
+                        ...currentProfile.selectedModelIdByType,
+                        [selectedTypeId]: model.id,
+                      },
+                    }))
+                  }
+                  type="button"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-sm font-black text-zinc-900">
+                        {model.brand} {model.name}
+                      </div>
+                      <div className="mt-1 text-[10px] text-zinc-500">
+                        Battery {model.capacityLabel}
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="text-sm font-black text-[#126b34]">
+                        {model.maxRangeKm} km
+                      </div>
+                      <div className="text-[9px] font-bold uppercase tracking-wider text-zinc-400">
+                        max range
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Manual Battery Planning */}
         <div className="bg-white rounded-2xl p-5 border border-zinc-100 shadow-sm mt-2">
           <div className="flex items-center gap-2 font-bold text-zinc-900 mb-5 text-base">
             <Battery size={18} className="text-[#126b34]" />
-            Predictive Battery Engine
+            Manual Battery Planning
           </div>
+
+          <ManualBatteryInput
+            helperText={`Enter the dashboard percentage for your ${selectedModelName}.`}
+            maxRangeKm={selectedModel.maxRangeKm}
+            onPercentageChange={(nextBatteryPercentage) =>
+              updateVehicleProfile((currentProfile) => ({
+                ...currentProfile,
+                batteryPercentage: nextBatteryPercentage,
+              }))
+            }
+            value={batteryPercentage}
+          />
           
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center mb-2 mt-5">
             <div>
               <h4 className="text-sm font-bold text-zinc-900">Battery Capacity</h4>
-              <p className="text-[10px] text-zinc-500">Adjust based on your hardware</p>
+              <p className="text-[10px] text-zinc-500">
+                Selected model: {selectedModelName}
+              </p>
             </div>
-            <span className="text-sm font-bold text-[#126b34]">75 kWh</span>
+            <span className="text-sm font-bold text-[#126b34]">
+              {selectedModel.capacityLabel}
+            </span>
           </div>
           <div className="w-full bg-zinc-100 h-1.5 rounded-full mb-6 mt-3">
-             <div className="bg-[#e2e8e4] w-[75%] h-full rounded-full"></div>
+             <div
+               className="bg-[#126b34] h-full rounded-full"
+               style={{ width: `${capacityPercent}%` }}
+             ></div>
           </div>
           
           <div className="flex flex-col gap-2">
@@ -80,8 +207,8 @@ export default function SelectVehicle() {
             </div>
             <div className="bg-[#eef7f1] rounded-xl p-3 flex justify-between items-center">
                <div>
-                 <h4 className="text-xs font-bold text-zinc-900">Full AC/Heating</h4>
-                 <p className="text-[9px] text-zinc-500 mt-0.5">Reduces range by ~12%</p>
+                 <h4 className="text-xs font-bold text-zinc-900">High Accessory Load</h4>
+                 <p className="text-[9px] text-zinc-500 mt-0.5">Lights, cargo, or climate use</p>
                </div>
                <div className="w-10 h-5 bg-[#126b34] rounded-full relative">
                  <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
@@ -100,18 +227,20 @@ export default function SelectVehicle() {
            </div>
         </div>
 
-        {/* Est. Live Range Card */}
+        {/* Est. Range Card */}
         <div className="bg-[#126b34] rounded-2xl p-5 shadow-lg relative overflow-hidden">
            <div className="absolute top-0 right-0 p-5">
              <Zap size={24} className="text-[#2bc18b]" />
            </div>
-           <p className="text-[9px] font-bold text-[#bbedcc] uppercase tracking-wider mb-1">EST. LIVE RANGE</p>
+           <p className="text-[9px] font-bold text-[#bbedcc] uppercase tracking-wider mb-1">EST. RANGE FROM ENTRY</p>
            <div className="flex items-baseline gap-1 mb-3">
-              <h2 className="text-5xl font-black text-white tracking-tighter">342</h2>
+              <h2 className="text-5xl font-black text-white tracking-tighter">
+                {estimatedRangeKm}
+              </h2>
               <span className="text-lg font-medium text-[#d1f2d9]">km</span>
            </div>
            <p className="text-[10px] text-[#d1f2d9] leading-relaxed mb-6 opacity-90 max-w-[85%]">
-             Based on your EV Car configuration, current elevation profile, and driving habits.
+             Based on your owner-entered {batteryPercentage}% battery, {selectedModelName} capacity, elevation profile, and driving habits.
            </p>
            
            <div className="bg-[#0e5428] rounded-xl p-4 mb-5 border border-[#1b8744]">
@@ -123,9 +252,12 @@ export default function SelectVehicle() {
               </p>
            </div>
            
-           <button className="w-full bg-white text-[#126b34] hover:bg-zinc-50 font-bold py-3.5 rounded-xl shadow-md transition-colors text-sm">
+           <Link
+             className="block w-full bg-white text-[#126b34] hover:bg-zinc-50 font-bold py-3.5 rounded-xl shadow-md transition-colors text-center text-sm"
+             href="/map"
+           >
              Start Journey
-           </button>
+           </Link>
         </div>
 
         {/* Journey Settings */}

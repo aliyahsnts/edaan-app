@@ -1,6 +1,7 @@
 import Link from "next/link";
 import TopHeader from "@/components/TopHeader";
-import { AlertCircle, BatteryCharging, Leaf, MapPin, Navigation, Map as MapIcon, Car, AlertTriangle, Zap, Gift } from "lucide-react";
+import ManualBatteryInput from "@/components/ManualBatteryInput";
+import { AlertCircle, BatteryCharging, Leaf, MapPin, Navigation, Map as MapIcon, Car, AlertTriangle, Gift } from "lucide-react";
 
 export default function Home() {
   return (
@@ -22,20 +23,19 @@ export default function Home() {
             <Car size={20} className="text-[#126b34]" />
           </div>
           <h2 className="text-lg font-bold text-zinc-900">Iloilo-BYD Atto 3</h2>
-          <p className="text-xs text-zinc-500">Last synced 2m ago</p>
-          
-          <div className="flex items-end gap-2 mt-4">
-            <span className="text-5xl font-black text-[#126b34] tracking-tighter">82%</span>
-            <Zap size={24} className="text-[#2bc18b] mb-1" />
-          </div>
-          
-          <div className="flex justify-between items-center mt-3 mb-4 text-sm font-medium">
-            <span className="text-zinc-600">Estimated Range</span>
-            <span className="text-zinc-900 font-bold">342km</span>
-          </div>
+          <p className="text-xs text-zinc-500">
+            EV and LEV battery status is entered by the owner.
+          </p>
+
+          <ManualBatteryInput
+            className="mt-4"
+            helperText="Type the percentage shown on your vehicle dashboard."
+            initialPercentage={82}
+            maxRangeKm={417}
+          />
           
           <button className="w-full edaan-btn-primary">
-            Controls
+            Update Trip Estimate
           </button>
         </div>
 

@@ -3,6 +3,7 @@
 import type { SVGProps } from "react";
 import TopHeader from "@/components/TopHeader";
 import EDaanMap from "@/components/EDaanMap";
+import ManualBatteryInput from "@/components/ManualBatteryInput";
 import { Search, SlidersHorizontal, BatteryCharging, Navigation } from "lucide-react";
 
 type IconProps = SVGProps<SVGSVGElement> & {
@@ -78,36 +79,27 @@ export default function Charging() {
             </div>
           </div>
 
-          {/* Connected Vehicle */}
+          {/* Manual Battery Entry */}
           <div className="rounded-2xl bg-[#1c2c26] text-white p-5 mb-6 relative overflow-hidden">
             <div className="absolute right-0 top-0 opacity-10 scale-150 translate-x-4 -translate-y-4">
               <BatteryCharging size={120} />
             </div>
-            <div className="flex justify-between items-start relative z-10">
+            <div className="relative z-10">
               <div>
-                <p className="text-[10px] text-zinc-400 font-bold tracking-wider uppercase mb-1">CONNECTED VEHICLE</p>
+                <p className="text-[10px] text-zinc-400 font-bold tracking-wider uppercase mb-1">MANUAL BATTERY INPUT</p>
                 <h3 className="text-lg font-bold">Iloilo-BYD Atto 3</h3>
+                <p className="mt-1 text-[10px] text-zinc-400">
+                  Enter the percentage from the dashboard before choosing a charger.
+                </p>
               </div>
-              <div className="text-right">
-                <div className="text-3xl font-black text-[#2bc18b]">82%</div>
-                <div className="text-[10px] text-zinc-400">Charging (Fast)</div>
-              </div>
-            </div>
-            
-            <div className="mt-5 flex justify-between items-end relative z-10">
-              <div className="w-1/2">
-                <div className="flex justify-between text-[10px] font-bold mb-1">
-                  <span className="text-zinc-400 uppercase tracking-wider">BATTERY HEALTH</span>
-                  <span className="text-[#2bc18b]">OPTIMAL</span>
-                </div>
-                <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-[#2bc18b] w-[82%] h-full rounded-full"></div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Est. Range</div>
-                <div className="text-lg font-bold">342 km</div>
-              </div>
+
+              <ManualBatteryInput
+                className="mt-4"
+                helperText="This value stays manual for EV and LEV owners."
+                initialPercentage={82}
+                maxRangeKm={417}
+                theme="dark"
+              />
             </div>
           </div>
 
