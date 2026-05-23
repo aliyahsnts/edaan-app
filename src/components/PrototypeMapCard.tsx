@@ -30,28 +30,24 @@ export default function PrototypeMapCard({
 
       <MapPreviewMarker
         label={startLabel}
-        marker="S"
         tone="start"
         x="left-[14%]"
         y="top-[67%]"
       />
       <MapPreviewMarker
         label={destinationLabel}
-        marker="D"
         tone="destination"
         x="left-[86%]"
         y="top-[35%]"
       />
       <MapPreviewMarker
         label="Charging stop pin"
-        marker="C"
         tone="charging"
         x="left-[47%]"
         y="top-[53%]"
       />
       <MapPreviewMarker
         label="Highway warning marker"
-        marker="!"
         tone="warning"
         x="left-[67%]"
         y="top-[43%]"
@@ -70,7 +66,7 @@ export default function PrototypeMapCard({
         <MapPreviewLegend label="Route line" tone="route" />
         <MapPreviewLegend label="Safe road segment" tone="safe" />
         <MapPreviewLegend label="Risky road segment" tone="risky" />
-        <MapPreviewLegend label="Charging and highway markers" tone="marker" />
+        <MapPreviewLegend label="Route pins" tone="marker" />
       </div>
     </div>
   );
@@ -78,30 +74,35 @@ export default function PrototypeMapCard({
 
 function MapPreviewMarker({
   label,
-  marker,
   tone,
   x,
   y,
 }: {
   label: string;
-  marker: string;
   tone: "charging" | "destination" | "start" | "warning";
   x: string;
   y: string;
 }) {
   const toneClass = {
-    charging: "border-sky-200 bg-sky-400 text-zinc-950",
-    destination: "border-white bg-rose-400 text-white",
-    start: "border-white bg-emerald-400 text-zinc-950",
-    warning: "border-white bg-amber-400 text-zinc-950",
+    charging: "border-sky-400 bg-sky-400/30",
+    destination: "border-rose-400 bg-rose-400/30",
+    start: "border-emerald-400 bg-emerald-400/30",
+    warning: "border-amber-400 bg-amber-400/30",
+  }[tone];
+  const dotClass = {
+    charging: "bg-sky-400",
+    destination: "bg-rose-400",
+    start: "bg-emerald-400",
+    warning: "bg-amber-400",
   }[tone];
 
   return (
     <div className={`absolute ${x} ${y} -translate-x-1/2 -translate-y-1/2`}>
       <div
-        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 text-base font-black shadow-xl ${toneClass}`}
+        aria-label={label}
+        className={`flex h-6 w-6 items-center justify-center rounded-full border-[3px] ring-2 ring-white shadow-xl ${toneClass}`}
       >
-        {marker}
+        <span className={`h-2.5 w-2.5 rounded-full ${dotClass}`} />
       </div>
       <div className="mt-2 max-w-36 rounded-md border border-zinc-700 bg-zinc-950/90 px-2.5 py-1.5 text-xs font-bold text-zinc-100 shadow-lg">
         {label}

@@ -35,15 +35,20 @@ export type MapPin = {
 
 type RouteMapProps = {
   chargingPins?: MapPin[];
+  className?: string;
   destinationLabel?: string;
+  fallbackCenter?: Coordinate;
+  fallbackZoom?: number;
   geometry: RouteGeometry | null;
   hazardPins?: MapPin[];
   restrictedSegments?: Coordinate[][];
+  showLegend?: boolean;
   showMaptilerNotice?: boolean;
   startLabel?: string;
 };
 
-const defaultCenter: Coordinate = [78.9629, 20.5937];
+const defaultCenter: Coordinate = [122.5621, 10.7202];
+const defaultZoom = 12.6;
 const fallbackStyle = "https://demotiles.maplibre.org/style.json";
 const _rawMapTiler = process.env.NEXT_PUBLIC_MAPTILER_KEY ?? "";
 let mapTilerKey = _rawMapTiler.trim();
@@ -55,7 +60,7 @@ if (mapTilerKey) {
     if (keyParam) {
       mapTilerKey = keyParam;
     }
-  } catch (e) {
+  } catch {
     // not a URL; keep the trimmed value
   }
 }
@@ -127,23 +132,34 @@ function setGeoJsonSource(
 
 function buildMarkerElement(pin: MapPin) {
   const element = document.createElement("div");
+  const dot = document.createElement("span");
   const isCharging = pin.type === "charging";
 
   element.className = [
     "flex",
-    "h-8",
-    "w-8",
+    "h-5",
+    "w-5",
     "items-center",
     "justify-center",
     "rounded-full",
-    "border-2",
+    "border-[3px]",
     "border-white",
-    "text-xs",
-    "font-bold",
+    "ring-2",
     "shadow-lg",
-    isCharging ? "bg-emerald-400 text-zinc-950" : "bg-amber-400 text-zinc-950",
+    "shadow-zinc-950/25",
+    isCharging
+      ? "bg-emerald-400/35 ring-emerald-400"
+      : "bg-amber-400/35 ring-amber-400",
   ].join(" ");
-  element.textContent = isCharging ? "C" : "!";
+  element.setAttribute("aria-label", pin.label);
+  element.title = pin.label;
+  dot.className = [
+    "h-2",
+    "w-2",
+    "rounded-full",
+    isCharging ? "bg-emerald-400" : "bg-amber-400",
+  ].join(" ");
+  element.append(dot);
 
   return element;
 }
@@ -187,6 +203,8 @@ function fitRouteBounds(
   map: MapLibreMap,
   geometry: RouteGeometry | null,
   pins: MapPin[],
+  fallbackCenter: Coordinate,
+  fallbackZoom: number,
 ) {
   const coordinates = [
     ...(geometry?.coordinates ?? []),
@@ -195,8 +213,8 @@ function fitRouteBounds(
 
   if (!coordinates.length) {
     map.easeTo({
-      center: defaultCenter,
-      zoom: 3.6,
+      center: fallbackCenter,
+      zoom: fallbackZoom,
     });
     return;
   }
@@ -214,10 +232,14 @@ function fitRouteBounds(
 
 export default function RouteMap({
   chargingPins = [],
+  className = "h-full min-h-[320px] w-full overflow-hidden rounded-lg border border-zinc-800",
   destinationLabel = "Destination",
+  fallbackCenter = defaultCenter,
+  fallbackZoom = defaultZoom,
   geometry,
   hazardPins = [],
   restrictedSegments = [],
+  showLegend = true,
   showMaptilerNotice = true,
   startLabel = "Start",
 }: RouteMapProps) {
@@ -238,10 +260,10 @@ export default function RouteMap({
       attributionControl: {
         compact: true,
       },
-      center: defaultCenter,
+      center: fallbackCenter,
       container: containerRef.current,
       style: mapStyle,
-      zoom: 3.6,
+      zoom: fallbackZoom,
     });
 
     map.addControl(
@@ -259,7 +281,7 @@ export default function RouteMap({
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [fallbackCenter, fallbackZoom]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -321,7 +343,13 @@ export default function RouteMap({
       }
 
       updateMarkers(activeMap, markersRef, allPins);
-      fitRouteBounds(activeMap, geometry, allPins);
+      fitRouteBounds(
+        activeMap,
+        geometry,
+        allPins,
+        fallbackCenter,
+        fallbackZoom,
+      );
     }
 
     if (activeMap.loaded()) {
@@ -333,10 +361,10 @@ export default function RouteMap({
         activeMap.off("load", renderOverlays);
       };
     }
-  }, [allPins, geometry, restrictedSegments]);
+  }, [allPins, fallbackCenter, fallbackZoom, geometry, restrictedSegments]);
 
   return (
-    <div className="relative h-full min-h-[320px] w-full overflow-hidden rounded-lg border border-zinc-800">
+    <div className={`relative ${className}`}>
       <div ref={containerRef} aria-label="Route map" className="h-full w-full" />
 
       {showMaptilerNotice && !mapTilerKey ? (
@@ -345,12 +373,18 @@ export default function RouteMap({
         </div>
       ) : null}
 
-      <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-        <MapBadge label="Route" tone="route" />
-        <MapBadge label="Charging" tone="charging" />
-        <MapBadge label="Hazard" tone="hazard" />
-        <MapBadge label="Restricted" tone="restricted" />
-      </div>
+      {showLegend ? (
+        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+          <MapBadge label="Route" tone="route" />
+          {chargingPins.length > 0 ? (
+            <MapBadge label="Charging" tone="charging" />
+          ) : null}
+          {hazardPins.length > 0 ? <MapBadge label="Hazard" tone="hazard" /> : null}
+          {restrictedSegments.length > 0 ? (
+            <MapBadge label="Restricted" tone="restricted" />
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="sr-only">
         {startLabel} to {destinationLabel}

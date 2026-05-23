@@ -3,7 +3,6 @@
 import TopHeader from "@/components/TopHeader";
 import EDaanMap from "@/components/EDaanMap";
 import { ShieldAlert, AlertTriangle, LightbulbOff, Camera, MapPin, Gift, Navigation, Send } from "lucide-react";
-import Link from "next/link";
 
 export default function Hazard() {
   return (
@@ -18,7 +17,7 @@ export default function Hazard() {
           </div>
           <h1 className="text-2xl font-black text-zinc-900 tracking-tight">Report a Hazard</h1>
           <p className="text-xs text-zinc-600 mt-2 leading-relaxed">
-            Keep Iloilo's bike lanes safe. Every verified report earns you <span className="font-bold text-[#126b34]">20 Eco-Points</span> for local sustainable rewards.
+            Keep Iloilo&apos;s bike lanes safe. Every verified report earns you <span className="font-bold text-[#126b34]">20 Eco-Points</span> for local sustainable rewards.
           </p>
         </div>
 

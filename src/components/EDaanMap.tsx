@@ -15,8 +15,12 @@ type MapPoint = {
   detail: string;
   id: string;
   label: string;
-  marker: string;
   tone: "charging" | "destination" | "start" | "warning";
+};
+
+type EDaanMapProps = {
+  className?: string;
+  showDemoOverlays?: boolean;
 };
 
 type RouteFeatureCollection = {
@@ -48,7 +52,7 @@ if (mapTilerKey) {
     if (keyParam) {
       mapTilerKey = keyParam;
     }
-  } catch (e) {
+  } catch {
     // not a URL, keep trimmed value
   }
 }
@@ -63,7 +67,6 @@ const samplePoints: MapPoint[] = [
     detail: "Sample origin near central Iloilo City.",
     id: "start-point",
     label: "Start point",
-    marker: "S",
     tone: "start",
   },
   {
@@ -71,7 +74,6 @@ const samplePoints: MapPoint[] = [
     detail: "Sample destination for the prototype route.",
     id: "destination",
     label: "Destination",
-    marker: "D",
     tone: "destination",
   },
   {
@@ -79,7 +81,6 @@ const samplePoints: MapPoint[] = [
     detail: "Suggested charging stop for a top-up before continuing.",
     id: "charging-point",
     label: "Suggested charging point",
-    marker: "C",
     tone: "charging",
   },
   {
@@ -87,7 +88,6 @@ const samplePoints: MapPoint[] = [
     detail: "Restricted or highway warning marker for LEV riders.",
     id: "restricted-warning",
     label: "Restricted / highway warning",
-    marker: "!",
     tone: "warning",
   },
 ];
@@ -153,33 +153,48 @@ function addRouteLayer(map: MapLibreMap) {
 
 function markerClass(tone: MapPoint["tone"]) {
   const toneClass = {
-    charging: "bg-sky-400 text-zinc-950",
-    destination: "bg-rose-400 text-white",
-    start: "bg-emerald-400 text-zinc-950",
-    warning: "bg-amber-400 text-zinc-950",
+    charging: "border-sky-400 bg-sky-400/30",
+    destination: "border-rose-400 bg-rose-400/30",
+    start: "border-emerald-400 bg-emerald-400/30",
+    warning: "border-amber-400 bg-amber-400/30",
   }[tone];
 
   return [
     "flex",
-    "h-9",
-    "w-9",
+    "h-5",
+    "w-5",
     "items-center",
     "justify-center",
     "rounded-full",
-    "border-2",
-    "border-white",
-    "text-sm",
-    "font-black",
+    "border-[3px]",
     "shadow-lg",
+    "shadow-zinc-950/25",
+    "ring-2",
+    "ring-white",
     toneClass,
   ].join(" ");
 }
 
+function markerDotClass(tone: MapPoint["tone"]) {
+  const toneClass = {
+    charging: "bg-sky-400",
+    destination: "bg-rose-400",
+    start: "bg-emerald-400",
+    warning: "bg-amber-400",
+  }[tone];
+
+  return ["h-2", "w-2", "rounded-full", toneClass].join(" ");
+}
+
 function buildMarkerElement(point: MapPoint) {
   const element = document.createElement("div");
+  const dot = document.createElement("span");
 
   element.className = markerClass(point.tone);
-  element.textContent = point.marker;
+  element.setAttribute("aria-label", point.label);
+  element.title = point.label;
+  dot.className = markerDotClass(point.tone);
+  element.append(dot);
 
   return element;
 }
@@ -218,12 +233,15 @@ function addMarkers(
   );
 }
 
-export default function EDaanMap({ className = "" }: { className?: string }) {
+export default function EDaanMap({
+  className = "",
+  showDemoOverlays = !className,
+}: EDaanMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<Marker[]>([]);
 
-  useEffect(() => {  
+  useEffect(() => {
     if (!containerRef.current || mapRef.current) {
       return;
     }
@@ -246,6 +264,10 @@ export default function EDaanMap({ className = "" }: { className?: string }) {
     );
 
     function renderDemoOverlays() {
+      if (!showDemoOverlays) {
+        return;
+      }
+
       addRouteLayer(map);
       addMarkers(map, markersRef);
     }
@@ -265,10 +287,14 @@ export default function EDaanMap({ className = "" }: { className?: string }) {
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [showDemoOverlays]);
 
   return (
-    <div className={`relative overflow-hidden ${className || "h-full min-h-[420px] edaan-card"}`}>
+    <div
+      className={`relative overflow-hidden ${
+        className || "h-full min-h-[420px] edaan-card"
+      }`}
+    >
       <div
         ref={containerRef}
         aria-label="Interactive e-Daan map centered on Iloilo City"
@@ -281,14 +307,14 @@ export default function EDaanMap({ className = "" }: { className?: string }) {
         </div>
       ) : null}
 
-      {!className && (
+      {showDemoOverlays && !className ? (
         <div className="absolute left-4 top-4 grid gap-2 p-3 edaan-card sm:grid-cols-2 pointer-events-auto">
           <MapLegend label="Start" tone="start" />
           <MapLegend label="Destination" tone="destination" />
           <MapLegend label="Charging" tone="charging" />
           <MapLegend label="Restricted" tone="warning" />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 type Coordinate = [number, number];
 
+type RouteWaypoint = Coordinate | string;
+
 type GeocodeFeature = {
   geometry?: {
     coordinates?: Coordinate;
@@ -68,6 +70,26 @@ function readPlace(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function readWaypoint(value: unknown): RouteWaypoint | null {
+  if (isCoordinate(value)) {
+    return value;
+  }
+
+  const place = readPlace(value);
+  return place ? place : null;
+}
+
+function readWaypoints(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map(readWaypoint)
+    .filter((waypoint): waypoint is RouteWaypoint => waypoint !== null)
+    .slice(0, 3);
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -127,6 +149,17 @@ async function geocodePlace(place: string, apiKey: string) {
   };
 }
 
+async function resolveWaypoint(waypoint: RouteWaypoint, apiKey: string) {
+  if (typeof waypoint === "string") {
+    return geocodePlace(waypoint, apiKey);
+  }
+
+  return {
+    label: "Route waypoint",
+    coordinates: waypoint,
+  };
+}
+
 function getRestrictedCategoryLabels(value: number) {
   return restrictedWayCategories
     .filter((category) => (value & category.bit) === category.bit)
@@ -167,11 +200,7 @@ function buildRestrictedRoadWarning(
   };
 }
 
-async function getDirections(
-  start: Coordinate,
-  destination: Coordinate,
-  apiKey: string,
-) {
+async function getDirections(coordinates: Coordinate[], apiKey: string) {
   const response = await fetch(
     `${orsBaseUrl}/v2/directions/${routeProfile}/geojson`,
     {
@@ -181,7 +210,7 @@ async function getDirections(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        coordinates: [start, destination],
+        coordinates,
         extra_info: ["waycategory"],
       }),
       cache: "no-store",
@@ -233,11 +262,12 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json().catch(() => null)) as
-    | { start?: unknown; destination?: unknown }
+    | { start?: unknown; destination?: unknown; waypoints?: unknown }
     | null;
 
   const startPlace = readPlace(body?.start);
   const destinationPlace = readPlace(body?.destination);
+  const waypoints = readWaypoints(body?.waypoints);
 
   if (!startPlace || !destinationPlace) {
     return NextResponse.json(
@@ -247,20 +277,29 @@ export async function POST(request: Request) {
   }
 
   try {
-    const [start, destination] = await Promise.all([
+    const [start, destination, ...resolvedWaypoints] = await Promise.all([
       geocodePlace(startPlace, apiKey),
       geocodePlace(destinationPlace, apiKey),
+      ...waypoints.map((waypoint) => resolveWaypoint(waypoint, apiKey)),
     ]);
 
-    const directions = await getDirections(
+    const routeCoordinates = [
       start.coordinates,
       destination.coordinates,
-      apiKey,
+    ];
+
+    routeCoordinates.splice(
+      1,
+      0,
+      ...resolvedWaypoints.map((waypoint) => waypoint.coordinates),
     );
+
+    const directions = await getDirections(routeCoordinates, apiKey);
 
     return NextResponse.json({
       start,
       destination,
+      waypoints: resolvedWaypoints,
       profile: routeProfile,
       ...directions,
     });

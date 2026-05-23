@@ -1,5 +1,5 @@
 import TopHeader from "@/components/TopHeader";
-import { BadgeCheck, Leaf, Bike, ShoppingBag, CheckCircle, Footprints } from "lucide-react";
+import { BadgeCheck, Leaf, Bike, CheckCircle, Footprints } from "lucide-react";
 
 export default function Rewards() {
   return (
@@ -29,7 +29,7 @@ export default function Rewards() {
           <div className="flex-1">
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Current Tier</p>
             <h3 className="text-lg font-black text-[#126b34] leading-tight">Green Guardian</h3>
-            <p className="text-[10px] font-bold text-zinc-600 mt-1 mb-1">550 pts to 'Eco Champion'</p>
+            <p className="text-[10px] font-bold text-zinc-600 mt-1 mb-1">550 pts to &apos;Eco Champion&apos;</p>
             <div className="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden">
               <div className="bg-[#126b34] w-[80%] h-full rounded-full"></div>
             </div>
